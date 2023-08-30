@@ -37,5 +37,5 @@ jobs:
 
     # Deployment using SSH
     - name: Deploy to Local Machine
-      run: ssh guy@213.57.121.34 "docker run guyedri/java:$NEW_VERSION"
+      run: ssh ubuntu@54.153.64.55 "docker run guyedri/java:1.0.10"
 
