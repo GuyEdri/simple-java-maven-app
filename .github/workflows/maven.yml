@@ -36,5 +36,5 @@ jobs:
           mvn deploy -Dmaven.repo.local=$HOME/.m2/repository \
             -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/GuyEdri/simple-java-maven-app \
             -Duser.name=GuyEdri -Duser.email=github@users.noreply.github.com \
-            -Dgpg.executable=gpg -Dgpg.passphrase=${{ secrets.githubpackage }}
+            -Dgpg.executable=gpg -Dgpg.passphrase=${{ secrets.GITHUBPACKAGE }}
 
