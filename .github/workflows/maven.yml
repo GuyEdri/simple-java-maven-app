@@ -28,14 +28,26 @@ jobs:
       run: mvn -B package --file pom.xml
 
     # Docker steps (same as before)
+    - name: Deploy to Laptop via SSH
+      run: |
+        # Write the SSH key from secrets to a file
+        echo "${{ secrets.LOCAL_MACHINE_SSH_KEY }}" > deploy_key
+        chmod 600 deploy_key
+        # Use SSH to deploy on your laptop
+        ssh -T -i deploy_key -o "StrictHostKeyChecking=no" ubuntu@ec2-54-153-64-55.us-west-1.compute.amazonaws.com << EOF
+          docker pull guyedri/java:1.0.10
+          docker stop my-app-container || true
+          docker rm my-app-container || true
+          docker run guyedri/java:1.0.10
+        EOF
 
     # Set up SSH
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.2
-      with:
-        ssh-private-key: ${{ secrets.LOCAL_MACHINE_SSH_KEY }}
+    #- name: Set up SSH
+    # uses: webfactory/ssh-agent@v0.5.2
+    # with:
+    #   ssh-private-key: ${{ secrets.LOCAL_MACHINE_SSH_KEY }}
 
     # Deployment using SSH
-    - name: Deploy to Local Machine
-      run: ssh ubuntu@54.153.64.55 "docker run guyedri/java:1.0.10"
+    # - name: Deploy to Local Machine
+    # run: ssh ubuntu@54.153.64.55 "docker run guyedri/java:1.0.10"
 
