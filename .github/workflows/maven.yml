@@ -35,5 +35,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: my-app
-          path: target/my-app.jar
+          path: target/my-app*
 
