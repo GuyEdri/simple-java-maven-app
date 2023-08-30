@@ -34,7 +34,7 @@ jobs:
         echo "${{ secrets.LOCAL_MACHINE_SSH_KEY }}" > deploy_key
         chmod 600 deploy_key
         # Use SSH to deploy on your laptop
-        ssh -T -i deploy_key -o "StrictHostKeyChecking=no" ubuntu@ec2-54-153-64-55.us-west-1.compute.amazonaws.com << EOF
+        ssh -T -i deploy_key -o "StrictHostKeyChecking=no" ubuntu@54.153.64.55 << EOF
           docker pull guyedri/java:1.0.10
           docker stop my-app-container || true
           docker rm my-app-container || true
