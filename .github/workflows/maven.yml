@@ -1,18 +1,20 @@
-name: Java CI with Maven and Deployment
+name: Java CI with Maven
 
 on:
   push:
     branches: [ "GuyEdri-patch-1" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -27,27 +29,24 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    # Docker steps (same as before)
+    # Docker steps
+    - name: Build Docker Image
+      run: docker build -t guyedri/java:$NEW_VERSION .
+
+    - name: Login to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push Docker Image
+      run: docker push guyedri/java:$NEW_VERSION
+
     - name: Deploy to Laptop via SSH
       run: |
         # Write the SSH key from secrets to a file
-        echo "${{ secrets.LOCAL_MACHINE_SSH_KEY }}" > deploy_key
-        chmod 600 deploy_key
+        echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > deploy_key
+        chmod 400 deploy_key
         # Use SSH to deploy on your laptop
         ssh -T -i deploy_key -o "StrictHostKeyChecking=no" ubuntu@54.153.64.55 << EOF
-          docker pull guyedri/java:1.0.10
           docker stop my-app-container || true
           docker rm my-app-container || true
-          docker run guyedri/java:1.0.10
+          docker run -d --name my-app-container guyedri/java:$NEW_VERSION
         EOF
-
-    # Set up SSH
-    #- name: Set up SSH
-    # uses: webfactory/ssh-agent@v0.5.2
-    # with:
-    #   ssh-private-key: ${{ secrets.LOCAL_MACHINE_SSH_KEY }}
-
-    # Deployment using SSH
-    # - name: Deploy to Local Machine
-    # run: ssh ubuntu@54.153.64.55 "docker run guyedri/java:1.0.10"
-
