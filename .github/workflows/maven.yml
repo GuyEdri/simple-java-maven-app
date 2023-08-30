@@ -9,6 +9,9 @@ jobs:
   build-version-and-deploy:
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
