@@ -31,10 +31,7 @@ jobs:
           mvn versions:set -DnewVersion=${NEW_VERSION}
           mvn clean package
 
-      - name: Deploy to GitHub Package Registry
-        run: |
-          mvn deploy -Dmaven.repo.local=$HOME/.m2/repository \
-            -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/GuyEdri/simple-java-maven-app \
-            -Duser.name=GuyEdri -Duser.email=github@users.noreply.github.com \
-            -Dgpg.executable=gpg -Dgpg.passphrase=${{ secrets.GITHUBPACKAGE }}
-
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
