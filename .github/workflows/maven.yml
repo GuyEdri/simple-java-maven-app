@@ -43,6 +43,7 @@ jobs:
       run: |
         # Write the SSH key from secrets to a file
         echo "${{ secrets.LOCAL_MACHINE_SSH_KEY }}" > deploy_key
+        chmod 400 deploy_key
         # Use SSH to deploy on your laptop
         ssh -T -i deploy_key -o "StrictHostKeyChecking=no" ubuntu@54.153.64.55 << EOF
           docker stop my-app-container || true
