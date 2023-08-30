@@ -1,12 +1,12 @@
-name: Build and Increment Version
+name: Build, Version, and Deploy
 
 on:
   push:
     branches:
-      - GuyEdri-patch-1  # Adjust the branch name as needed
+      - GuyEdri-patch-1
 
 jobs:
-  build-and-increment:
+  build-version-and-deploy:
 
     runs-on: ubuntu-latest
 
@@ -23,17 +23,18 @@ jobs:
 
       - name: Set Version and Build JAR
         run: |
-          MAJOR=1  # Update with your desired major version
-          MINOR=0  # Update with your desired minor version
-          PATCH=$(date +'%Y%m%d%H%M%S')  # Generate a patch based on current date and time
+          MAJOR=1
+          MINOR=0
+          PATCH=$(date +'%Y%m%d%H%M%S')
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
           mvn versions:set -DnewVersion=${NEW_VERSION}
           mvn clean package
 
-      - name: Upload JAR Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: my-app
-          path: target/my-app*
+      - name: Deploy to GitHub Package Registry
+        run: |
+          mvn deploy -Dmaven.repo.local=$HOME/.m2/repository \
+            -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/GuyEdri/simple-java-maven-app \
+            -Duser.name=GuyEdri -Duser.email=github@users.noreply.github.com \
+            -Dgpg.executable=gpg -Dgpg.passphrase=${{ secrets.githubpackage }}
 
